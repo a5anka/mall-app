@@ -14,11 +14,13 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include <ccn/ccn.h>
 #include <ccn/uri.h>
 
 #include "server.h"
+#include "ccn_handler.h"
 
 // Main data structure used
 struct Server_T
@@ -30,13 +32,13 @@ struct Server_T
 
 // Prototypes for local functions
 static void add_prefix_to_server(Server_T,
-				 const char *);
+                                 const char *);
 static enum ccn_upcall_res incoming_interest(struct ccn_closure *selfp,
-					     enum ccn_upcall_kind kind,
-					     struct ccn_upcall_info *info);
+                                             enum ccn_upcall_kind kind,
+                                             struct ccn_upcall_info *info);
 static Server_T init_server_obj();
 static void register_server_in_ccnd(Server_T,
-				    const char *);
+                                    const char *);
 
 // Interface function definitions
 Server_T
@@ -83,16 +85,25 @@ add_prefix_to_server(Server_T server, const char *name)
   ccn_name_from_uri(server->basename, name);
 }
 
-static enum ccn_upcall_res incoming_interest(struct ccn_closure *selfp,
-		  enum ccn_upcall_kind kind,
-		  struct ccn_upcall_info *info)
+static enum ccn_upcall_res
+incoming_interest(struct ccn_closure *selfp,
+                  enum ccn_upcall_kind kind,
+                  struct ccn_upcall_info *info)
 {
   Server_T server = selfp->data;
-  struct ccn_charbuf *cob = ccn_charbuf_create();
-  struct ccn_signing_params sp = CCN_SIGNING_PARAMS_INIT;
 
-  ccn_sign_content(server->handler, cob, server->basename, &sp, "Message", 8);
-  ccn_put(server->handler, cob->buf, cob->length);
+  /* Some testing code
+     Remove this
+  */
+  char buf[20];
+  static int count = 1;
+  sprintf(buf,"Count = %d", count++);
+  /************************************/
+
+  send_string_with_version(server->handler,
+                           server->basename,
+                           buf);
+
 
   return(CCN_UPCALL_RESULT_OK);
 }
@@ -118,7 +129,7 @@ static void register_server_in_ccnd(Server_T server, const char * name)
   add_prefix_to_server(server, name);
 
   struct ccn_closure *in_interest;
-  in_interest = calloc(1, sizeof(in_interest));
+  in_interest = calloc(1, sizeof(*in_interest));
   in_interest->p = &incoming_interest;
   in_interest->data = server;
 

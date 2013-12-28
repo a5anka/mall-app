@@ -1,8 +1,8 @@
 /*
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This program is free software: you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 #include "server.h"
+#include "client.h"
 
 #define MALL_CCNX_PREFIX "/mall"
 
@@ -31,12 +32,28 @@ int main(int argc, char *argv[])
       return EXIT_FAILURE;
     }
 
+  Client_T client;
+  client = create_client(MALL_CCNX_PREFIX);
+
+  if (client == NULL)
+    {
+      printf("Cannot create client!\n");
+      return EXIT_FAILURE;
+    }
+
+  send_location_index_request(client);
+
   for (;;) {
     printf("Server listening...\n");
-    server_run(server, 1000);
+    server_run(server, 100);
+    client_run(client, 1000);
+
+  send_location_index_request(client);
+
   }
 
   destroy_server(&server);
+  destroy_client(&client);
 
   return EXIT_SUCCESS;
 }
