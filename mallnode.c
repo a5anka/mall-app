@@ -18,6 +18,7 @@
 
 #include "server.h"
 #include "client.h"
+#include "prefixstore.h"
 
 #define MALL_CCNX_PREFIX "/mall"
 

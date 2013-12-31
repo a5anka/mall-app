@@ -7,7 +7,7 @@ LFLAGS =
 LIBS = -lccn -lcrypto
 
 # define the C source files
-SRCS = server.c client.c ccn_handler.c mallnode.c
+SRCS = server.c client.c ccn_handler.c prefixstore.c mallnode.c
 
 OBJS = $(SRCS:.c=.o)
 
